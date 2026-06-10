@@ -1,1 +1,1125 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Business Case — Salesforce Marketing Cloud para NGR</title>
+  
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+   <style>
+       /* 1. VARIABLES Y ESTILOS BASE */
+       :root {
+           --sf-blue:      #0176D3;
+           --sf-dark:      #032D60;
+           --sf-accent:    #1AB9FF;
+           --sf-light:     #F3F3F3;
+           --sf-white:     #FFFFFF;
+           --sf-text:      #333333;
+           --sf-gray:      #706E6B;
+           --ngr-red:      #E31837;
+           --ngr-dark:     #8A0C20;
+           --ngr-orange:   #F37021;
+       }
+
+
+       body { font-family: 'Inter', sans-serif; font-size: 16px; color: var(--sf-text); background-color: var(--sf-light); margin: 0; padding: 0; }
+       h1, h2, h3, h4, h5, h6 { color: var(--sf-dark); font-weight: 800; }
+
+
+       /* 2. HEADER Y NAVEGACIÓN */
+       .site-header { position: sticky; top: 0; z-index: 1000; background: linear-gradient(90deg, var(--sf-dark) 0%, var(--sf-blue) 100%); color: var(--sf-white); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+       .header-content { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+       .header-center { text-align: center; flex-grow: 1; }
+       .header-center h1 { color: var(--sf-white); margin: 0; font-size: 1.5rem; font-weight: 800; }
+       .header-center p { margin: 0; font-size: 0.9rem; opacity: 0.8; font-weight: 400; }
+
+
+       /* LOGOS */
+       .logo-container { display: flex; align-items: center; background: var(--sf-white); padding: 5px 12px; border-radius: 6px; }
+       .logo-synth { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; padding-bottom: 3px; }
+       .logo-text { font-family: 'Quicksand', sans-serif; font-weight: 800; font-size: 26px; color: var(--ngr-red); letter-spacing: -1px; margin-bottom: 1px; }
+       .logo-bar { display: flex; width: 100%; height: 6px; border-radius: 1px; overflow: hidden; }
+       .bar-red { background-color: var(--ngr-red); flex: 2; } .bar-org { background-color: var(--ngr-orange); flex: 1; }
+       .logo-container.sf-logo { background: transparent; padding: 0; }
+
+
+       /* NAVEGACIÓN TABS */
+       .nav-tabs-custom { display: flex; background-color: var(--sf-dark); padding: 0 20px; overflow-x: auto; }
+       .nav-tabs-custom .nav-btn { background: transparent; border: none; color: rgba(255, 255, 255, 0.7); padding: 15px 20px; font-weight: 600; cursor: pointer; transition: all 300ms ease; white-space: nowrap; border-bottom: 4px solid transparent; }
+       .nav-tabs-custom .nav-btn:hover { color: var(--sf-white); }
+       .nav-tabs-custom .nav-btn.active { color: var(--sf-white); border-bottom: 4px solid var(--sf-accent); }
+
+
+       /* 3. PANELES DE CONTENIDO */
+       .tab-panel { display: none; animation: fadeInSlide 300ms ease forwards; padding: 40px 20px; max-width: 1240px; margin: 0 auto; }
+       .tab-panel.active { display: block; }
+       @keyframes fadeInSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+
+       /* 4. COMPONENTES VISUALES */
+       .custom-card { background: var(--sf-white); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 24px; margin-bottom: 24px; transition: transform 200ms ease, box-shadow 200ms ease; }
+       .custom-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+       .border-left-red { border-left: 5px solid var(--ngr-red); } .border-top-accent { border-top: 5px solid var(--sf-accent); } .border-left-gray { border-left: 5px solid var(--sf-gray); }
+
+
+       .gradient-card { background: linear-gradient(135deg, var(--sf-dark) 0%, var(--sf-blue) 100%); color: var(--sf-white); }
+       .gradient-card h3 { color: var(--sf-white); }
+       .idea-icon { font-size: 2rem; margin-bottom: 15px; color: var(--ngr-red); }
+
+
+       /* SCENARIO BUTTONS */
+       .scenario-container { display: flex; gap: 10px; justify-content: center; margin-bottom: 30px; }
+       .scenario-btn { background: var(--sf-white); border: 2px solid #EAEAEA; border-radius: 8px; padding: 10px 20px; font-weight: 700; color: var(--sf-gray); cursor: pointer; transition: all 200ms ease; }
+       .scenario-btn:hover { border-color: var(--sf-blue); color: var(--sf-blue); }
+       .scenario-btn.active-low { border-color: var(--ngr-orange); background: var(--ngr-orange); color: white; }
+       .scenario-btn.active-avg { border-color: var(--sf-blue); background: var(--sf-blue); color: white; }
+       .scenario-btn.active-high { border-color: #2E844A; background: #2E844A; color: white; }
+
+
+       /* KPI HERO Y BARRAS */
+       .hero-kpi { background: linear-gradient(135deg, var(--sf-dark) 0%, var(--sf-blue) 100%); color: var(--sf-white); text-align: center; padding: 50px 20px; border-radius: 12px; margin-bottom: 30px; }
+       .hero-kpi h2 { color: var(--sf-white); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+       .hero-kpi .total-value { font-size: 4.5rem; font-weight: 800; margin-bottom: 10px; color: var(--sf-accent); text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+       .hero-metrics { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
+       .metric-box { text-align: center; background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); }
+       .metric-box span { display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+       .metric-box strong { font-size: 1.5rem; color: var(--sf-white); }
+
+
+       .dist-bar-container { height: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; display: flex; overflow: hidden; margin: 30px auto 10px auto; max-width: 800px; }
+       .dist-segment { height: 100%; transition: width 1000ms ease-out; }
+       .dist-labels { display: flex; justify-content: center; gap: 20px; font-size: 0.85rem; max-width: 800px; margin: 0 auto; flex-wrap: wrap; }
+       .dist-label-item { display: flex; align-items: center; gap: 5px; }
+       .dist-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+
+       /* TABLAS Y OTROS */
+       .table-custom { width: 100%; background: var(--sf-white); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+       .table-custom th { background-color: var(--sf-light); color: var(--sf-dark); font-weight: 600; padding: 12px 15px; }
+       .table-custom td { padding: 12px 15px; border-top: 1px solid #EAEAEA; vertical-align: middle; }
+       .baseline-header { background-color: var(--ngr-red); padding: 15px 20px; border-radius: 12px 12px 0 0; display: flex; align-items: center; }
+       .baseline-header h5 { color: #FFFFFF !important; margin: 0; font-weight: 800; }
+       .table-sub-row td { background-color: #FAFAFA; font-size: 0.9em; border-top: 1px dashed #EAEAEA; }
+      
+       .timeline { position: relative; padding-left: 30px; margin-bottom: 40px; }
+       .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: var(--sf-blue); }
+       .timeline-item { position: relative; margin-bottom: 25px; }
+       .timeline-badge { position: absolute; left: -30px; width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, var(--sf-blue), var(--sf-accent)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; top: 2px; box-shadow: 0 0 0 4px var(--sf-light); }
+
+
+       .roadmap-col { background: var(--sf-white); border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); height: 100%; }
+       .badge-now { background-color: var(--sf-blue); color: white; } .badge-next { background-color: var(--ngr-orange); color: white; } .badge-future { background-color: var(--sf-gray); color: white; }
+
+
+       .cta-section { background: linear-gradient(135deg, var(--ngr-dark) 0%, var(--ngr-red) 100%); color: white; text-align: center; padding: 60px 20px; border-radius: 12px; margin-top: 40px; }
+       .cta-section h2 { color: white; }
+       .footer { background: var(--sf-dark); color: rgba(255,255,255,0.7); text-align: center; padding: 20px; font-size: 0.85rem; margin-top: 40px; }
+
+
+       .chart-wrapper { position: relative; height: 350px; width: 100%; }
+       .chart-wrapper-small { position: relative; height: 220px; width: 100%; }
+
+
+       .formula-box { background-color: #F8F9FA; border-left: 4px solid var(--sf-blue); padding: 15px; margin-bottom: 20px; border-radius: 4px; font-family: monospace; font-size: 14px; }
+
+
+       @media print {
+           .site-header { position: static; background: var(--sf-dark) !important; -webkit-print-color-adjust: exact; }
+           .nav-tabs-custom, .scenario-container { display: none !important; }
+           .tab-panel { display: block !important; opacity: 1 !important; transform: none !important; page-break-before: always; }
+           .tab-panel:first-child { page-break-before: auto; }
+           .hero-kpi { background: var(--sf-dark) !important; -webkit-print-color-adjust: exact; }
+           body { background-color: white; }
+       }
+   </style>
+</head>
+<body>
+
+
+   <header class="site-header">
+       <div class="header-content">
+           <div class="logo-container">
+               <div class="logo-synth">
+                   <div class="logo-text">NGR</div>
+                   <div class="logo-bar"><div class="bar-red"></div><div class="bar-org"></div></div>
+               </div>
+           </div>
+          
+           <div class="header-center d-none d-md-block">
+               <h1>Business Case — Marketing Cloud</h1>
+               <p>NGR Perú · Preparado por BVS Latam · Junio 2026</p>
+           </div>
+          
+           <div class="logo-container sf-logo">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg" alt="Salesforce" style="height: 40px;">
+           </div>
+       </div>
+       <div class="nav-tabs-custom" role="tablist">
+           <button class="nav-btn active" onclick="abrirTab(event, 'tab1')">1. Contexto</button>
+           <button class="nav-btn" onclick="abrirTab(event, 'tab2')">2. Palancas de Valor</button>
+           <button class="nav-btn" onclick="abrirTab(event, 'tab3')">3. Caso de Negocio</button>
+           <button class="nav-btn" onclick="abrirTab(event, 'tab4')">4. Próximos Pasos</button>
+           <button class="nav-btn" onclick="abrirTab(event, 'tab5')">5. Soporte y Fórmulas</button>
+       </div>
+   </header>
+
+
+   <main id="tab1" class="tab-panel active">
+       <div class="row mb-5">
+           <div class="col-12">
+               <div class="custom-card gradient-card text-center p-5">
+                   <h3 class="mb-3">Monetizando la Base de Datos con IA y Personalización</h3>
+                   <p class="mb-0 fs-5 mx-auto" style="max-width: 900px;">Tener 1 millón de clientes no genera valor si la comunicación es transaccional y masiva. Salesforce Marketing Cloud transforma esta base inactiva en ingresos recurrentes mediante journeys automatizados, omnicanalidad y predicción de comportamiento.</p>
+               </div>
+           </div>
+       </div>
+
+
+       <div class="p-5 mb-5 rounded text-white shadow-sm" style="background: linear-gradient(135deg, var(--sf-dark) 0%, var(--sf-blue) 100%);">
+           <h3 class="text-white mb-3">Diagnóstico: Crecimiento Atrapado en Operación Manual</h3>
+           <p class="fs-5 mb-0" style="opacity: 0.9;">La base de clientes crece. El canal digital crece. Pero sin las herramientas correctas, NGR no puede capturar ese crecimiento. Actualmente existe una brecha operativa por segmentación manual, falta de journeys automáticos, nula optimización de tiempos de envío (STO) y fatiga de base que resulta en una inversión sin retorno medible.</p>
+       </div>
+
+
+       <h4 class="mb-3">Ideas Fuerza: ¿Por qué transformar el Marketing hoy?</h4>
+       <div class="row g-4 mb-5">
+           <div class="col-md-4">
+               <div class="custom-card border-left-red text-center h-100">
+                   <div class="idea-icon">🎯</div><h5 class="fs-5 mb-3" style="color: var(--ngr-red);">Monetización Directa</h5>
+                   <p class="small text-muted mb-0">Pasar del "Batch & Blast" (correo masivo) a ofertas 1:1 basadas en la preferencia de compra (ej. combos familiares vs. antojos individuales).</p>
+               </div>
+           </div>
+           <div class="col-md-4">
+               <div class="custom-card border-left-red text-center h-100">
+                   <div class="idea-icon">🔄</div><h5 class="fs-5 mb-3" style="color: var(--ngr-red);">Recuperación de Fugas (Win-Back)</h5>
+                   <p class="small text-muted mb-0">El 30% de la base instalada está inactiva. Identificar el riesgo de abandono tempranamente e inyectar ofertas dinámicas recupera ingresos perdidos.</p>
+               </div>
+           </div>
+           <div class="col-md-4">
+               <div class="custom-card border-left-red text-center h-100">
+                   <div class="idea-icon">⏱️</div><h5 class="fs-5 mb-3" style="color: var(--ngr-red);">Eficiencia Operativa</h5>
+                   <p class="small text-muted mb-0">Eliminar horas de procesamiento manual de bases de datos. El equipo de NGR se enfocará en estrategia comercial, no en limpieza de Excels.</p>
+               </div>
+           </div>
+       </div>
+
+
+       <h4 class="mb-3">Mapa de Valor - Brecha vs. Oportunidad</h4>
+       <div class="custom-card p-0 mb-5 overflow-hidden border-0">
+           <table class="table table-custom table-sm mb-0">
+               <thead>
+                   <tr>
+                       <th style="width: 30%">Problema Actual</th>
+                       <th style="width: 20%">KPI que Impacta</th>
+                       <th style="width: 20%">Benchmark de Industria</th>
+                       <th style="width: 30%">Impacto en NGR</th>
+                   </tr>
+               </thead>
+               <tbody class="small">
+                   <tr>
+                       <td>Segmentación manual, lenta, fuera de la plataforma — el equipo no alcanza a cubrir las 6 marcas</td>
+                       <td>Tasa de conversión<br>Cobertura de marcas</td>
+                       <td class="fw-bold text-success">+10% a +25% conversión</td>
+                       <td>Popeyes puede segmentar "clientes de pollo en Arequipa" en tiempo real y enviar oferta específica — hoy es imposible.</td>
+                   </tr>
+                   <tr>
+                       <td>Sin journeys automáticos — no existe bienvenida, win-back, post-compra ni fidelización</td>
+                       <td>Frecuencia de compra<br>Recuperación de cliente</td>
+                       <td class="fw-bold text-success">+8% a +20% frecuencia<br>3% a 8% recuperación</td>
+                       <td>Cliente sin compra en 45 días → push automático → día 50 SMS con cupón personalizado para re-enganche.</td>
+                   </tr>
+                   <tr>
+                       <td>Sin Send Time Optimization — todos reciben mensajes a la misma hora para toda la base</td>
+                       <td>Open rate<br>Tasa de conversión digital</td>
+                       <td class="fw-bold text-success">+10% a +15% open rate</td>
+                       <td>36M emails/mes x +10% open rate = 3.6M aperturas adicionales - sin costo extra, sin aumentar volumen de envíos.</td>
+                   </tr>
+                   <tr>
+                       <td>Baja productividad operativa — el equipo destina su tiempo a tareas manuales y repetitivas</td>
+                       <td>Productividad del equipo<br>Eficiencia en Costos</td>
+                       <td class="fw-bold text-success">30% a 60% reducción de horas</td>
+                       <td>Los 4 analistas liberan hasta 4,608h/año ocupadas en tareas manuales, redirigiéndose a estrategia de retención.</td>
+                   </tr>
+               </tbody>
+           </table>
+       </div>
+
+
+       <h4 class="mb-3">Hard Facts: El Salto al Marketing Agéntico</h4>
+       <div class="row g-4 mb-5">
+           <div class="col-md-4">
+               <div class="custom-card border-top-accent text-center h-100 mb-0">
+                   <span class="d-block" style="font-size: 3rem; font-weight: 800; color: var(--sf-blue);">71%</span>
+                   <p class="small text-muted mb-0 fw-bold">De los clientes exigen personalización inmediata y 1:1</p>
+               </div>
+           </div>
+           <div class="col-md-4">
+               <div class="custom-card border-top-accent text-center h-100 mb-0">
+                   <span class="d-block" style="font-size: 3rem; font-weight: 800; color: var(--sf-blue);">6.1x</span>
+                   <p class="small text-muted mb-0 fw-bold">Mayor conversión en journeys vs. campañas masivas</p>
+               </div>
+           </div>
+           <div class="col-md-4">
+               <div class="custom-card border-top-accent text-center h-100 mb-0">
+                   <span class="d-block" style="font-size: 3rem; font-weight: 800; color: var(--sf-blue);">40%</span>
+                   <p class="small text-muted mb-0 fw-bold">De mejora en eficiencia con IA Agéntica en Marketing</p>
+               </div>
+           </div>
+       </div>
+
+
+   </main>
+
+
+   <main id="tab2" class="tab-panel">
+       <h2 class="mb-4">Contexto y Baseline NGR</h2>
+       <div class="custom-card mb-5 p-0" style="border: 1px solid var(--ngr-red); overflow:hidden;">
+           <div class="baseline-header">
+               <h5>Datos de Operación Actual (Baseline)</h5>
+           </div>
+           <div class="p-0">
+               <div class="row m-0">
+                   <div class="col-md-6 p-4 border-end">
+                       <h6 class="fw-bold mb-3" style="color: var(--sf-dark);">Datos principales entregados por el cliente</h6>
+                       <table class="table table-sm table-custom mb-0 shadow-none border-0">
+                           <tbody>
+                               <tr><td>Número de marcas activas</td><td class="text-end fw-bold">6</td></tr>
+                               <tr><td>Tiendas Bembos</td><td class="text-end fw-bold">52 (Lima)</td></tr>
+                               <tr><td>Tiendas Popeyes</td><td class="text-end fw-bold">47 (Lima + Arequipa)</td></tr>
+                               <tr><td>% venta digital actual</td><td class="text-end fw-bold">20%</td></tr>
+                               <tr><td>Ticket promedio en tienda</td><td class="text-end fw-bold">$7 USD</td></tr>
+                               <tr><td>Ticket promedio digital</td><td class="text-end fw-bold">$9 USD</td></tr>
+                               <tr><td>Frecuencia compra Bembos</td><td class="text-end fw-bold">1.7 veces/mes</td></tr>
+                               <tr><td>Bembos + Papa Johns = % ventas</td><td class="text-end fw-bold">60%</td></tr>
+                               <tr><td>Equipo de Marketing</td><td class="text-end fw-bold">4 personas</td></tr>
+                               <tr><td>Costo solución actual</td><td class="text-end fw-bold">$50,000 USD/año</td></tr>
+                               <tr><td>Base de contactos Año 1</td><td class="text-end fw-bold">1,000,000</td></tr>
+                           </tbody>
+                       </table>
+                   </div>
+                   <div class="col-md-6 p-4 bg-light">
+                       <h6 class="fw-bold mb-3" style="color: var(--ngr-red);">Supuestos considerados para los cálculos</h6>
+                       <table class="table table-sm table-custom mb-0 shadow-none border-0">
+                           <tbody>
+                               <tr><td>Tasa de compra mensual sobre base</td><td class="text-end fw-bold">8%</td></tr>
+                               <tr><td>% de inactivos sobre la base</td><td class="text-end fw-bold">30%</td></tr>
+                               <tr><td>Margen bruto/operativo</td><td class="text-end fw-bold">20%</td></tr>
+                               <tr><td>Costo promedio por FTE MKT</td><td class="text-end fw-bold">$12,000 USD/año</td></tr>
+                               <tr><td>Crecimiento anual de base</td><td class="text-end fw-bold">~300k</td></tr>
+                           </tbody>
+                       </table>
+                       <div class="mt-3 p-3 bg-white rounded small border-start border-3 border-danger shadow-sm">
+                           <em>Nota: La tasa del 8% de compra mensual es la variable de mayor sensibilidad en el modelo y está sujeta a validación técnica con NGR Analytics.</em>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+
+       <h3 class="mb-4">Escenarios de Impacto y Lógica</h3>
+       <div class="custom-card p-0 mb-5 overflow-hidden border-0">
+           <table class="table table-custom mb-0">
+               <thead style="background-color: var(--sf-dark); color: white;">
+                   <tr>
+                       <th style="color: white; width: 30%">Escenario</th>
+                       <th style="color: white; width: 70%">Lógica de Calibración</th>
+                   </tr>
+               </thead>
+               <tbody class="small">
+                   <tr>
+                       <td><strong>🟠 Conservador</strong></td>
+                       <td>Piso del Benchmark. Mínimo resultado documentado en la industria QSR.</td>
+                   </tr>
+                   <tr>
+                       <td><strong>🔵 Esperado</strong></td>
+                       <td>Promedio del Benchmark. Resultado típico de una implementación estable y bien ejecutada.</td>
+                   </tr>
+                   <tr>
+                       <td><strong>🟢 Optimista</strong></td>
+                       <td>Techo del Benchmark. Adopción plena de IA y journeys avanzados.</td>
+                   </tr>
+               </tbody>
+           </table>
+       </div>
+
+
+       <h3 class="mb-4">Benchmarks por palanca y por escenario</h3>
+       <div class="custom-card p-0 mb-4 overflow-hidden border-0">
+           <table class="table table-custom mb-0">
+               <thead>
+                   <tr>
+                       <th>Concepto de Impacto</th>
+                       <th>Palanca</th>
+                       <th>Rango Industria</th>
+                       <th>🟠 Conservador (Low)</th>
+                       <th>🔵 Esperado (Avg)</th>
+                       <th>🟢 Optimista (High)</th>
+                   </tr>
+               </thead>
+               <tbody class="small">
+                   <tr>
+                       <td rowspan="3" class="fw-bold align-middle text-primary">📈 Incremento de Ventas</td>
+                       <td>Incremento ticket promedio digital</td>
+                       <td>+5% → +15%</td>
+                       <td>+5%</td>
+                       <td>+10%</td>
+                       <td>+15%</td>
+                   </tr>
+                   <tr>
+                       <td>Incremento frecuencia de compra</td>
+                       <td>+8% → +20%</td>
+                       <td>+8%</td>
+                       <td>+14%</td>
+                       <td>+20%</td>
+                   </tr>
+                   <tr>
+                       <td>Mejora tasa de conversión digital</td>
+                       <td>+10% → +25%</td>
+                       <td>+10%</td>
+                       <td>+17.5%</td>
+                       <td>+25%</td>
+                   </tr>
+                   <tr>
+                       <td class="fw-bold align-middle text-success">🔄 Adquisición de Clientes</td>
+                       <td>Recuperación de clientes inactivos</td>
+                       <td>3% → 8% de base inactiva</td>
+                       <td>3%</td>
+                       <td>5.5%</td>
+                       <td>8%</td>
+                   </tr>
+                   <tr>
+                       <td class="fw-bold align-middle text-warning">⚙️ Productividad</td>
+                       <td>Reducción trabajo operativo equipo MKT</td>
+                       <td>30% → 60% de horas liberadas</td>
+                       <td>30%</td>
+                       <td>45%</td>
+                       <td>60%</td>
+                   </tr>
+               </tbody>
+           </table>
+       </div>
+
+
+       <div class="alert alert-secondary d-flex align-items-center mb-5" role="alert">
+           <div class="me-3 fs-3">ℹ️</div>
+           <div class="small">
+               <strong>Factor anti-canibalización - Sin doble conteo:</strong> Las tres primeras palancas (ticket, frecuencia, conversión) actúan sobre la misma base de compradores activos. Sumarlas de forma independiente inflaría el resultado. El modelo aplica un factor combinado multiplicativo. El win-back actúa sobre inactivos, por lo que no hay canibalización.
+           </div>
+       </div>
+
+
+       <h3 class="mb-4">Curva de adopción — Año 1 en 3 períodos</h3>
+       <p class="text-muted mb-3">El modelo no asume beneficio pleno desde el día 1. El Año 1 se divide en 3 períodos de 4 meses (Promedio efectivo = 50%):</p>
+       <div class="custom-card p-0 mb-5 overflow-hidden border-0">
+           <table class="table table-custom table-sm mb-0 text-center">
+               <thead class="table-light">
+                   <tr>
+                       <th>Período</th>
+                       <th>Meses</th>
+                       <th>Factor de Captura</th>
+                       <th class="text-start">¿Qué ocurre en NGR?</th>
+                   </tr>
+               </thead>
+               <tbody class="small">
+                   <tr>
+                       <td>Período 1</td>
+                       <td>1 - 4</td>
+                       <td class="fw-bold text-danger">20%</td>
+                       <td class="text-start">Implementación, migración de datos, configuración. Piloto en Bembos y Popeyes.</td>
+                   </tr>
+                   <tr>
+                       <td>Período 2</td>
+                       <td>5 - 8</td>
+                       <td class="fw-bold text-warning">50%</td>
+                       <td class="text-start">Expansión a 6 marcas. Journeys de bienvenida y win-back activos.</td>
+                   </tr>
+                   <tr>
+                       <td>Período 3</td>
+                       <td>9 - 12</td>
+                       <td class="fw-bold text-success">80%</td>
+                       <td class="text-start">Einstein STO activo. Equipo autónomo. Todos los journeys funcionando.</td>
+                   </tr>
+                   <tr class="table-secondary fw-bold">
+                       <td>Años 2–5</td>
+                       <td>13 - 60</td>
+                       <td>100%</td>
+                       <td class="text-start">Plataforma en velocidad de crucero.</td>
+                   </tr>
+               </tbody>
+           </table>
+       </div>
+   </main>
+
+
+   <main id="tab3" class="tab-panel">
+      
+       <h3 class="mb-4 text-center">Seleccione el Escenario de Impacto</h3>
+       <div class="scenario-container">
+           <button id="btn-low" class="scenario-btn" onclick="setScenario('low')">🟠 Conservador (Low)</button>
+           <button id="btn-avg" class="scenario-btn" onclick="setScenario('avg')">🔵 Esperado (Avg)</button>
+           <button id="btn-high" class="scenario-btn" onclick="setScenario('high')">🟢 Optimista (High)</button>
+       </div>
+
+
+       <div class="hero-kpi">
+           <h2>Beneficio Neto Acumulado a 5 Años</h2>
+           <div class="total-value" id="kpi-total-val">$0</div>
+           <p class="mb-2" id="kpi-subtitle">Basado en datos reales de NGR</p>
+          
+           <div class="hero-metrics">
+               <div class="metric-box"><span>Retorno de Inversión (ROI)</span><strong id="kpi-roi">-</strong></div>
+               <div class="metric-box"><span>Periodo de Recuperación</span><strong id="kpi-payback">-</strong></div>
+           </div>
+
+
+           <div class="dist-bar-container">
+               <div class="dist-segment" id="seg-kpi" style="background-color: var(--sf-blue);"></div>
+               <div class="dist-segment" id="seg-wb" style="background-color: #0B5CAB;"></div>
+               <div class="dist-segment" id="seg-prod" style="background-color: #F5A800;"></div>
+               <div class="dist-segment" id="seg-sav" style="background-color: var(--sf-accent);"></div>
+           </div>
+           <div class="dist-labels">
+               <div class="dist-label-item"><div class="dist-dot" style="background: var(--sf-blue);"></div><span id="lbl-kpi">Ventas (KPIs)</span></div>
+               <div class="dist-label-item"><div class="dist-dot" style="background: #0B5CAB;"></div><span id="lbl-wb">Adquisición (Win-Back)</span></div>
+               <div class="dist-label-item"><div class="dist-dot" style="background: #F5A800;"></div><span id="lbl-prod">Productividad</span></div>
+               <div class="dist-label-item"><div class="dist-dot" style="background: var(--sf-accent);"></div><span id="lbl-sav">Ahorro</span></div>
+           </div>
+       </div>
+
+
+       <div class="row mb-5">
+           <div class="col-lg-8 mb-4 mb-lg-0">
+               <div class="custom-card">
+                   <h6 class="mb-4">Composición del Beneficio Anual <span class="badge bg-light text-dark ms-1" id="chart-scenario-label"></span></h6>
+                   <div class="chart-wrapper">
+                       <canvas id="chartYears"></canvas>
+                   </div>
+               </div>
+           </div>
+           <div class="col-lg-4">
+               <div class="custom-card bg-light border-0 h-100">
+                   <h6 class="mb-4">Curva Rampa Año 1</h6>
+                   <div class="chart-wrapper-small">
+                       <canvas id="chartRamp"></canvas>
+                   </div>
+                   <p class="small text-muted mt-4 mb-0">El modelo asume una adopción en 3 escalones de 4 meses (20%, 50%, 80%) generando un promedio neto efectivo de captura del 50% para KPIs en el Año 1.</p>
+               </div>
+           </div>
+       </div>
+
+
+       <h3 class="mb-4 text-center">Detalle del Beneficio Operativo por Palanca <span class="badge bg-dark ms-2 fw-normal" id="benefit-label"></span></h3>
+       <p class="text-center small text-muted mb-4">Muestra el beneficio bruto anual separado en los 3 conceptos y las 5 palancas funcionales, sin descontar inversión.</p>
+       <div class="custom-card p-0 mb-5" style="overflow-x: auto;">
+           <table class="table table-custom mb-0">
+               <thead>
+                   <tr>
+                       <th>Concepto / Palanca (USD)</th>
+                       <th class="text-end">Año 1</th>
+                       <th class="text-end">Año 2</th>
+                       <th class="text-end">Año 3</th>
+                       <th class="text-end">Año 4</th>
+                       <th class="text-end">Año 5</th>
+                       <th class="text-end fw-bold">Total 5 Años</th>
+                   </tr>
+               </thead>
+               <tbody id="benefit-body">
+                   </tbody>
+           </table>
+       </div>
+
+
+       <h3 class="mb-4 mt-5">Inversión Salesforce — Pricing Real</h3>
+       <div class="custom-card p-0" style="overflow:hidden; border: 1px solid var(--sf-blue);">
+           <div class="p-3" style="background: var(--sf-dark); color: white;">
+               <h6 class="mb-0">Contrato Salesforce Marketing Cloud · NGR Perú</h6>
+           </div>
+           <div class="p-0">
+               <table class="table table-custom mb-0" style="box-shadow: none;">
+                   <thead><tr><th>Concepto</th><th class="text-end">Año 1</th><th class="text-end">Año 2</th><th class="text-end">Año 3</th><th class="text-end">Año 4</th><th class="text-end">Año 5</th><th class="text-end">Total</th></tr></thead>
+                   <tbody>
+                       <tr><td>Licencia SFMC</td><td class="text-end">$137,355</td><td class="text-end">$155,957</td><td class="text-end">$177,346</td><td class="text-end">$201,432</td><td class="text-end">$226,963</td><td class="text-end fw-bold">$899,053</td></tr>
+                       <tr><td>Implementación (one-time)</td><td class="text-end">$87,000</td><td class="text-end">—</td><td class="text-end">—</td><td class="text-end">—</td><td class="text-end">—</td><td class="text-end fw-bold">$87,000</td></tr>
+                       <tr class="table-light fw-bold"><td>Total Inversión Anual</td><td class="text-end">$224,355</td><td class="text-end">$155,957</td><td class="text-end">$177,346</td><td class="text-end">$201,432</td><td class="text-end">$226,963</td><td class="text-end" style="color: var(--ngr-red);">$986,053</td></tr>
+                   </tbody>
+               </table>
+           </div>
+           <div class="p-3 bg-light border-top">
+               <p class="small text-muted mb-0">El pricing crece año a año porque refleja el crecimiento de la base de contactos proyectado — NGR paga más porque escala el número de clientes activos que monetiza.</p>
+           </div>
+       </div>
+
+
+       <h3 class="mb-4 mt-5">Resumen de Resultados y Flujo Neto <span class="badge bg-dark ms-2 fw-normal" id="summary-label"></span></h3>
+       <p class="small text-muted mb-4">Totalización del ejercicio financiero: cruce de beneficios totales brutos vs. inversión y generación de flujos netos.</p>
+       <div class="custom-card p-0 mb-5" style="overflow-x: auto; border: 2px solid var(--sf-dark);">
+           <table class="table table-custom mb-0">
+               <thead>
+                   <tr style="background-color: var(--sf-light);">
+                       <th>Métricas de Flujo (USD)</th>
+                       <th class="text-end">Año 1</th>
+                       <th class="text-end">Año 2</th>
+                       <th class="text-end">Año 3</th>
+                       <th class="text-end">Año 4</th>
+                       <th class="text-end">Año 5</th>
+                       <th class="text-end fw-bold">Total 5 Años</th>
+                   </tr>
+               </thead>
+               <tbody id="summary-body">
+                   </tbody>
+           </table>
+       </div>
+
+
+   </main>
+
+
+   <main id="tab4" class="tab-panel">
+       <h2 class="mb-4">Próximos Pasos y Roadmap</h2>
+      
+       <div class="row g-5">
+           <div class="col-lg-4">
+               <h4 class="mb-4">Acciones Inmediatas</h4>
+               <div class="timeline">
+                   <div class="timeline-item">
+                       <div class="timeline-badge">1</div>
+                       <h5 class="fs-6">Validación Ejecutiva</h5>
+                       <p class="small text-muted">Aprobación del Business Case y los escenarios de crecimiento con la Gerencia General y Finanzas.</p>
+                   </div>
+                   <div class="timeline-item">
+                       <div class="timeline-badge">2</div>
+                       <h5 class="fs-6">Revisión Técnica</h5>
+                       <p class="small text-muted">Sesión de arquitectura para asegurar las integraciones de datos (Data Cloud / CDP) con los POS de NGR.</p>
+                   </div>
+                   <div class="timeline-item">
+                       <div class="timeline-badge">3</div>
+                       <h5 class="fs-6">Firma Comercial</h5>
+                       <p class="small text-muted">Cierre de contrato de licenciamiento e inicio del proceso formal de Kick-off de implementación.</p>
+                   </div>
+               </div>
+           </div>
+
+
+           <div class="col-lg-8">
+               <h4 class="mb-4">Roadmap de Adopción</h4>
+               <div class="row g-3">
+                   <div class="col-md-4">
+                       <div class="roadmap-col" style="border-top: 4px solid var(--sf-blue);">
+                           <span class="badge badge-now mb-2">NOW · Fase 1 (Mes 1-3)</span>
+                           <ul class="list-unstyled small mb-0">
+                               <li class="mb-2"><strong>Alcance:</strong><br>Quick Wins y Migración</li>
+                               <li class="mb-2"><strong>Journeys:</strong><br>Welcome, Cumpleaños, Promos base</li>
+                               <li><strong>Canales:</strong><br>Email + SMS</li>
+                           </ul>
+                       </div>
+                   </div>
+                   <div class="col-md-4">
+                       <div class="roadmap-col" style="border-top: 4px solid var(--ngr-orange);">
+                           <span class="badge badge-next mb-2">NEXT · Fase 2 (Mes 4-6)</span>
+                           <ul class="list-unstyled small mb-0">
+                               <li class="mb-2"><strong>Alcance:</strong><br>Automatización Compleja</li>
+                               <li class="mb-2"><strong>Journeys:</strong><br>Carrito abandonado, Win-back predictivo</li>
+                               <li><strong>Canales:</strong><br>Omnicanalidad + Push App</li>
+                           </ul>
+                       </div>
+                   </div>
+                   <div class="col-md-4">
+                       <div class="roadmap-col" style="border-top: 4px solid var(--sf-gray);">
+                           <span class="badge badge-future mb-2">FUTURE · Fase 3 (A2+)</span>
+                           <ul class="list-unstyled small mb-0">
+                               <li class="mb-2"><strong>Alcance:</strong><br>Plataforma full speed</li>
+                               <li class="mb-2"><strong>Journeys:</strong><br>Personalización avanzada (1:1 AI)</li>
+                               <li><strong>Productos:</strong><br>Data Extensions + Analytics</li>
+                           </ul>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+
+       <div class="cta-section">
+           <h2 class="mb-3">Convirtamos la base de 1 millón de clientes en utilidad operativa real</h2>
+           <p class="mb-4 lead">NGR Perú × Salesforce Marketing Cloud · BVS Latam · Junio 2026</p>
+           <button class="btn btn-outline-light me-2 fw-bold px-4 py-2" style="background-color: var(--sf-dark); border-color: var(--sf-dark);">Agendar Próxima Sesión</button>
+           <button class="btn btn-outline-light fw-bold px-4 py-2" onclick="window.print()">Descargar PDF</button>
+       </div>
+   </main>
+
+
+   <main id="tab5" class="tab-panel">
+       <h2 class="mb-4">Soporte - Fórmulas y Metodología del Modelo</h2>
+       <p class="text-muted mb-5">Detalle técnico de la lógica matemática utilizada para proyectar los beneficios a 5 años (Cifras demostradas en USD).</p>
+
+
+       <div class="formula-box">
+           <strong>Fórmula 1 - Venta Digital Anual</strong><br>
+           Venta_Digital_Año_N = Base_Contactos_N × 8% (tasa compra SUPUESTO BVS) × $9 (ticket) × 12 meses<br><br>
+           Año 1: 1,000,000 × 8% × $9 × 12 = $8,640,000<br>
+           Año 2: 1,300,000 × 8% × $9 × 12 = $11,232,000<br>
+           Año 3: 1,600,000 × 8% × $9 × 12 = $13,824,000<br>
+           Año 4: 1,900,000 × 8% × $9 × 12 = $16,416,000<br>
+           Año 5: 2,200,000 × 8% × $9 × 12 = $19,008,000
+       </div>
+       <p class="small text-muted fst-italic mb-4">NOTA: La tasa del 8% es un supuesto BVS pendiente de validación con el equipo de Analytics de NGR. Sensibilidad: un cambio a 7% reduce el valor neto en ~12%; a 9% lo incrementa en ~12%.</p>
+
+
+       <div class="formula-box">
+           <strong>Fórmula 2 - Inactivos por Año</strong><br>
+           Inactivos_Año_N = Base_Contactos_N × 30%<br><br>
+           Año 1: 1,000,000 × 30% = 300,000<br>
+           Año 5: 2,200,000 × 30% = 660,000
+       </div>
+
+
+       <div class="formula-box">
+           <strong>Fórmula 3 - Factor Combinado Anti-Canibalización</strong><br>
+           Factor_Combinado = (1 + Δticket) × (1 + Δfrecuencia) × (1 + Δconversión) - 1<br><br>
+           Conservador (Low): (1.05) × (1.08) × (1.10) - 1 = 0.2474 → +24.74%<br>
+           Esperado (Avg): (1.10) × (1.14) × (1.175) - 1 = 0.4732 → +47.32%<br>
+           Optimista (High): (1.15) × (1.20) × (1.25) - 1 = 0.7250 → +72.50%
+       </div>
+
+
+       <div class="formula-box">
+           <strong>Fórmula 4 - Beneficio KPIs (impacto conjunto)</strong><br>
+           Beneficio_KPIs_Año_N = Venta_Digital_N × Factor_Combinado × 20% (margen) × Factor_Ramp<br><br>
+           Factor_Ramp Año 1: Promedio (20% + 50% + 80%) / 3 = 50%<br>
+           Factor_Ramp Años 2-5 = 100%<br><br>
+           Año 1 Esperado (Avg): $8,640,000 × 47.32% × 20% × 50% = $408,845<br>
+           Año 2 Esperado (Avg): $11,232,000 × 47.32% × 20% × 100% = $1,062,996
+       </div>
+
+
+       <div class="formula-box">
+           <strong>Fórmula 5 - Beneficio Win-Back</strong><br>
+           Beneficio_WinBack_Año_N = Inactivos_N × % Recuperación × $9 (ticket) × 12 meses × 20% (margen) × Factor_Ramp<br><br>
+           Año 1 Esperado (5.5%): 300,000 × 5.5% × $9 × 12 × 20% × 50% = $178,200<br>
+           Año 2 Esperado: 390,000 × 5.5% × $9 × 12 × 20% × 100% = $463,320
+       </div>
+       <p class="small text-muted fst-italic mb-4">Nota sobre margen Win-Back: El 20% aplicado es conservador. El CAC ya fue amortizado y el costo marginal es casi nulo.</p>
+
+
+       <div class="formula-box">
+           <strong>Fórmula 6 - Productividad del Equipo de Marketing</strong><br>
+           Horas totales equipo/año = 4 analistas × 1,920h = 7,680h/año<br>
+           Costo por hora = $12,000/año ÷ 1,920h = $6.25/hora<br><br>
+           Ahorro anual (Low - 30%): 2,304h × $6.25 = $14,400 (1.2 FTE equivalentes)<br>
+           Ahorro anual (Avg - 45%): 3,456h × $6.25 = $21,600 (1.8 FTE equivalentes)<br>
+           Ahorro anual (High - 60%): 4,608h × $6.25 = $28,800 (2.4 FTE equivalentes)
+       </div>
+
+
+       <div class="formula-box">
+           <strong>Fórmula 7 - Flujo Neto Anual</strong><br>
+           Flujo_Neto_Año_N = Ahorro_Reemplazo + Productividad_MKT + Beneficio_KPIs + Beneficio_WinBack - Inversión_Año_N<br><br>
+           Año 1 Esperado: $50,000 + $21,600 + $408,845 + $178,200 - $224,355 = $434,290<br>
+           Año 2 Esperado: $50,000 + $21,600 + $1,062,996 + $463,320 - $155,957 = $1,441,959
+       </div>
+
+
+       <div class="formula-box">
+           <strong>Fórmula 8 - ROI a 5 Años y Payback</strong><br>
+           ROI (X-veces) = Valor_Bruto_5_Años / Inversión_Total_5_Años<br><br>
+           Conservador: $4,986,304 / $986,053 = 5.1x<br>
+           Esperado: $9,163,671 / $986,053 = 9.3x<br>
+           Optimista: $13,678,000 / $986,053 = 13.9x<br><br>
+           Payback mes a mes con periodos reales del Año 1:<br>
+           Esperado acumula $986K de inversión en el mes 9.
+       </div>
+   </main>
+
+
+   <footer class="footer">
+       Metodología BVS Value Engineering · Confidencial · Junio 2026 · NGR Perú × Salesforce Marketing Cloud
+   </footer>
+
+
+   <script>
+       // ── Datos del modelo NGR ──────────────────────────────────────────────
+       var SCENARIOS = {
+           low: {
+               label:   '🟠 Conservador (Low)',
+               subtitle: 'Escenario Conservador (Low) — Piso del benchmark',
+               factor:  0.2474,
+               wb_pct:  0.03,
+               prod_usd: 14400,
+               roi:     '5.1x',
+               payback: '~16 meses',
+               color:   'active-low'
+           },
+           avg: {
+               label:   '🔵 Esperado (Avg)',
+               subtitle: 'Escenario Esperado (Avg) — Promedio del benchmark',
+               factor:  0.4732,
+               wb_pct:  0.055,
+               prod_usd: 21600,
+               roi:     '9.3x',
+               payback: '~9 meses',
+               color:   'active-avg'
+           },
+           high: {
+               label:   '🟢 Optimista (High)',
+               subtitle: 'Escenario Optimista (High) — Techo del benchmark',
+               factor:  0.7250,
+               wb_pct:  0.08,
+               prod_usd: 28800,
+               roi:     '13.9x',
+               payback: '~7 meses',
+               color:   'active-high'
+           }
+       };
+
+
+       var BASE_CONTACTS = [1000000, 1300000, 1600000, 1900000, 2200000];
+       var TICKET        = 9;
+       var PURCHASE_RATE = 0.08;
+       var MARGIN        = 0.20;
+       var INACTIVE_PCT  = 0.30;
+       var SAVINGS       = 50000;
+       var INVEST        = [224355, 155957, 177346, 201432, 226963];
+       var RAMP_Y1       = 0.50; // Factor promedio año 1 para KPIs y Winback
+
+
+       var curScenario = 'avg';
+       var chartY = null;
+       var chartR = null;
+
+
+       // ── Formato USD ───────────────────────────────────────────────────────
+       function fUSD(v) {
+           return new Intl.NumberFormat('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}).format(v);
+       }
+
+
+       // ── Cálculo del modelo ────────────────────────────────────────────────
+       function calcModel(sc) {
+           var s = SCENARIOS[sc];
+           var ramp = [RAMP_Y1, 1, 1, 1, 1];
+
+
+           var ventas = BASE_CONTACTS.map(b => b * PURCHASE_RATE * TICKET * 12);
+           var inact  = BASE_CONTACTS.map(b => b * INACTIVE_PCT);
+
+
+           var kpi_full = ventas.map(v => v * s.factor * MARGIN);
+           var wb_full  = inact.map(i => i * s.wb_pct * TICKET * 12 * MARGIN);
+
+
+           var kpi  = kpi_full.map((v, n) => v * ramp[n]);
+           var wb   = wb_full.map((v, n)  => v * ramp[n]);
+          
+           // Productividad y Ahorro no llevan ramp de 50% según el PDF, operan flat por año
+           var prod = [s.prod_usd, s.prod_usd, s.prod_usd, s.prod_usd, s.prod_usd];
+           var sav  = [SAVINGS, SAVINGS, SAVINGS, SAVINGS, SAVINGS];
+
+
+           var benefit = kpi.map((v,n) => v + wb[n] + prod[n] + sav[n]);
+           var net     = benefit.map((v,n) => v - INVEST[n]);
+
+
+           var total_kpi  = kpi.reduce((a,b) => a+b, 0);
+           var total_wb   = wb.reduce((a,b)  => a+b, 0);
+           var total_prod = prod.reduce((a,b) => a+b, 0);
+           var total_sav  = sav.reduce((a,b)  => a+b, 0);
+           var total_ben  = benefit.reduce((a,b) => a+b, 0);
+           var total_inv  = INVEST.reduce((a,b)  => a+b, 0);
+           var total_net  = net.reduce((a,b)  => a+b, 0);
+
+
+           return {
+               kpi, wb, prod, sav, benefit, net,
+               total_kpi, total_wb, total_prod, total_sav,
+               total_ben, total_inv, total_net
+           };
+       }
+
+
+       // ── Render hero KPI y barras ──────────────────────────────────────────
+       function renderHero(sc, m) {
+           var s = SCENARIOS[sc];
+           document.getElementById('kpi-total-val').innerText = fUSD(m.total_ben);
+           document.getElementById('kpi-subtitle').innerText  = 'Basado en datos reales de NGR · ' + s.subtitle;
+           document.getElementById('kpi-roi').innerText       = s.roi;
+           document.getElementById('kpi-payback').innerText   = s.payback;
+
+
+           if (m.total_ben > 0) {
+               var pKpi  = m.total_kpi  / m.total_ben * 100;
+               var pWb   = m.total_wb   / m.total_ben * 100;
+               var pProd = m.total_prod / m.total_ben * 100;
+               var pSav  = m.total_sav  / m.total_ben * 100;
+
+
+               document.getElementById('seg-kpi').style.width  = pKpi  + '%';
+               document.getElementById('seg-wb').style.width   = pWb   + '%';
+               document.getElementById('seg-prod').style.width = pProd + '%';
+               document.getElementById('seg-sav').style.width  = pSav  + '%';
+           }
+       }
+
+
+       // ── Render tabla Desglose 5 Palancas ───────────────────────────────────
+       function renderBenefitTable(m) {
+           var tbody = document.getElementById('benefit-body');
+           tbody.innerHTML = '';
+
+
+           // Concepto 1: Aumento de Ventas (Agrupado en Impacto KPIs)
+           tbody.innerHTML += `
+               <tr class="fw-bold" style="background-color: #F0F8FF; color: var(--sf-blue);">
+                   <td colspan="7">📊 Concepto 1: Incremento de Ventas (Impacto Conjunto)</td>
+               </tr>
+               <tr class="table-sub-row">
+                   <td class="ps-4">1. Incremento ticket promedio digital</td>
+                   <td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td>
+               </tr>
+               <tr class="table-sub-row">
+                   <td class="ps-4">2. Incremento frecuencia de compra</td>
+                   <td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td>
+               </tr>
+               <tr class="table-sub-row">
+                   <td class="ps-4">3. Mejora tasa de conversión digital</td>
+                   <td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td><td class="text-end text-muted">~</td>
+               </tr>
+               <tr>
+                   <td class="fw-bold text-end pe-4">Total Impacto Conjunto KPIs × 20% Margen</td>
+                   <td class="text-end fw-bold">${fUSD(m.kpi[0])}</td>
+                   <td class="text-end fw-bold">${fUSD(m.kpi[1])}</td>
+                   <td class="text-end fw-bold">${fUSD(m.kpi[2])}</td>
+                   <td class="text-end fw-bold">${fUSD(m.kpi[3])}</td>
+                   <td class="text-end fw-bold">${fUSD(m.kpi[4])}</td>
+                   <td class="text-end fw-bold" style="color: var(--sf-blue);">${fUSD(m.total_kpi)}</td>
+               </tr>
+           `;
+
+
+           // Concepto 2: Adquisición de Clientes
+           tbody.innerHTML += `
+               <tr class="fw-bold" style="background-color: #F8F9FA; color: #0B5CAB;">
+                   <td colspan="7">🔄 Concepto 2: Adquisición de Clientes</td>
+               </tr>
+               <tr class="table-sub-row">
+                   <td class="ps-4">4. Recuperación de Inactivos (Win-Back) × 20% Margen</td>
+                   <td class="text-end">${fUSD(m.wb[0])}</td>
+                   <td class="text-end">${fUSD(m.wb[1])}</td>
+                   <td class="text-end">${fUSD(m.wb[2])}</td>
+                   <td class="text-end">${fUSD(m.wb[3])}</td>
+                   <td class="text-end">${fUSD(m.wb[4])}</td>
+                   <td class="text-end fw-bold" style="color: #0B5CAB;">${fUSD(m.total_wb)}</td>
+               </tr>
+           `;
+
+
+           // Concepto 3: Productividad y Ahorro
+           tbody.innerHTML += `
+               <tr class="fw-bold" style="background-color: #FFFDF5; color: #F5A800;">
+                   <td colspan="7">⚙️ Concepto 3: Productividad y Ahorro</td>
+               </tr>
+               <tr class="table-sub-row">
+                   <td class="ps-4">5. Reducción Trabajo Operativo Equipo MKT</td>
+                   <td class="text-end">${fUSD(m.prod[0])}</td>
+                   <td class="text-end">${fUSD(m.prod[1])}</td>
+                   <td class="text-end">${fUSD(m.prod[2])}</td>
+                   <td class="text-end">${fUSD(m.prod[3])}</td>
+                   <td class="text-end">${fUSD(m.prod[4])}</td>
+                   <td class="text-end fw-bold">${fUSD(m.total_prod)}</td>
+               </tr>
+               <tr class="table-sub-row">
+                   <td class="ps-4">+ Ahorro reemplazo solución actual</td>
+                   <td class="text-end">${fUSD(m.sav[0])}</td>
+                   <td class="text-end">${fUSD(m.sav[1])}</td>
+                   <td class="text-end">${fUSD(m.sav[2])}</td>
+                   <td class="text-end">${fUSD(m.sav[3])}</td>
+                   <td class="text-end">${fUSD(m.sav[4])}</td>
+                   <td class="text-end fw-bold">${fUSD(m.total_sav)}</td>
+               </tr>
+           `;
+       }
+
+
+       // ── Render tabla flujo de caja resumen ────────────────────────────────
+       function renderSummaryTable(m) {
+           var accum = [];
+           var running = 0;
+           m.net.forEach(v => { running += v; accum.push(running); });
+
+
+           var tbody = document.getElementById('summary-body');
+           tbody.innerHTML = `
+               <tr>
+                   <td>Total Beneficios Anuales Brutos</td>
+                   <td class="text-end">${fUSD(m.benefit[0])}</td>
+                   <td class="text-end">${fUSD(m.benefit[1])}</td>
+                   <td class="text-end">${fUSD(m.benefit[2])}</td>
+                   <td class="text-end">${fUSD(m.benefit[3])}</td>
+                   <td class="text-end">${fUSD(m.benefit[4])}</td>
+                   <td class="text-end fw-bold">${fUSD(m.total_ben)}</td>
+               </tr>
+               <tr>
+                   <td>Total Inversión Salesforce</td>
+                   <td class="text-end text-danger">(${fUSD(INVEST[0])})</td>
+                   <td class="text-end text-danger">(${fUSD(INVEST[1])})</td>
+                   <td class="text-end text-danger">(${fUSD(INVEST[2])})</td>
+                   <td class="text-end text-danger">(${fUSD(INVEST[3])})</td>
+                   <td class="text-end text-danger">(${fUSD(INVEST[4])})</td>
+                   <td class="text-end fw-bold text-danger">(${fUSD(m.total_inv)})</td>
+               </tr>
+               <tr class="fw-bold table-light">
+                   <td>Flujo Neto Anual</td>
+                   <td class="text-end">${fUSD(m.net[0])}</td>
+                   <td class="text-end">${fUSD(m.net[1])}</td>
+                   <td class="text-end">${fUSD(m.net[2])}</td>
+                   <td class="text-end">${fUSD(m.net[3])}</td>
+                   <td class="text-end">${fUSD(m.net[4])}</td>
+                   <td class="text-end" style="color: var(--sf-blue);">${fUSD(m.total_net)}</td>
+               </tr>
+               <tr class="fw-bold">
+                   <td style="color: #2E844A;">Flujo Neto Acumulado a 5 Años</td>
+                   <td class="text-end text-success">${fUSD(accum[0])}</td>
+                   <td class="text-end text-success">${fUSD(accum[1])}</td>
+                   <td class="text-end text-success">${fUSD(accum[2])}</td>
+                   <td class="text-end text-success">${fUSD(accum[3])}</td>
+                   <td class="text-end text-success">${fUSD(accum[4])}</td>
+                   <td class="text-end"></td>
+               </tr>
+           `;
+       }
+
+
+       // ── Render gráficos ───────────────────────────────────────────────────
+       function renderCharts(m) {
+           var tab3 = document.getElementById('tab3');
+           if (!tab3 || tab3.style.display === 'none') return;
+
+
+           var labels = ['Año 1', 'Año 2', 'Año 3', 'Año 4', 'Año 5'];
+
+
+           var elY = document.getElementById('chartYears');
+           if (elY) {
+               if (chartY) chartY.destroy();
+               chartY = new Chart(elY.getContext('2d'), {
+                   type: 'bar',
+                   data: {
+                       labels: labels.map((l, i) => l + ' (' + fUSD(m.benefit[i]) + ')'),
+                       datasets: [
+                           { label: 'Ventas (KPIs)',      data: m.kpi,  backgroundColor: '#0176D3', borderRadius: 4 },
+                           { label: 'Adquisición (WB)',   data: m.wb,   backgroundColor: '#0B5CAB', borderRadius: 4 },
+                           { label: 'Productividad',      data: m.prod, backgroundColor: '#F5A800', borderRadius: 4 },
+                           { label: 'Ahorro Solución',    data: m.sav,  backgroundColor: '#1AB9FF', borderRadius: 4 }
+                       ]
+                   },
+                   options: {
+                       responsive: true, maintainAspectRatio: false,
+                       scales: {
+                           x: { stacked: true, grid: { display: false } },
+                           y: { stacked: true, border: { display: false }, ticks: { callback: v => '$' + (v/1000000).toFixed(1) + 'M' } }
+                       },
+                       plugins: {
+                           tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + fUSD(c.raw); } } }
+                       }
+                   }
+               });
+           }
+
+
+           var elR = document.getElementById('chartRamp');
+           if (elR) {
+               if (chartR) chartR.destroy();
+               // Representación de rampa en 3 periodos: 1-4 (20%), 5-8 (50%), 9-12 (80%)
+               var dataR = [0.2, 0.2, 0.2, 0.2, 0.5, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 0.8];
+               chartR = new Chart(elR.getContext('2d'), {
+                   type: 'line',
+                   data: {
+                       labels: ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
+                       datasets: [{
+                           label: '% Adopción (KPIs y Win-Back)', data: dataR,
+                           borderColor: '#0176D3', backgroundColor: 'rgba(1,118,211,0.1)',
+                           fill: true, stepped: true, pointRadius: 3
+                       }]
+                   },
+                   options: {
+                       responsive: true, maintainAspectRatio: false,
+                       plugins: { legend: { display: false } },
+                       scales: {
+                           x: { grid: { display: false } },
+                           y: { min: 0, max: 1.1, ticks: { callback: v => (v*100) + '%' } }
+                       }
+                   }
+               });
+           }
+       }
+
+
+       // ── Actualizar todo ───────────────────────────────────────────────────
+       function update() {
+           var m = calcModel(curScenario);
+           renderHero(curScenario, m);
+           renderBenefitTable(m);
+           renderSummaryTable(m);
+          
+           var lbl = SCENARIOS[curScenario].label;
+           var el1 = document.getElementById('chart-scenario-label');
+           var el2 = document.getElementById('benefit-label');
+           var el3 = document.getElementById('summary-label');
+           if (el1) el1.innerText = lbl;
+           if (el2) el2.innerText = lbl;
+           if (el3) el3.innerText = lbl;
+          
+           setTimeout(function() { renderCharts(m); }, 100);
+       }
+
+
+       // ── Cambio de escenario ───────────────────────────────────────────────
+       function setScenario(sc) {
+           curScenario = sc;
+           ['low','avg','high'].forEach(function(k) {
+               var btn = document.getElementById('btn-' + k);
+               btn.className = 'scenario-btn';
+               if (k === sc) btn.className += ' ' + SCENARIOS[k].color;
+           });
+           update();
+       }
+
+
+       // ── Navegación entre tabs ─────────────────────────────────────────────
+       function abrirTab(evt, tabId) {
+           var paneles = document.getElementsByClassName('tab-panel');
+           for (var i = 0; i < paneles.length; i++) {
+               paneles[i].style.display = 'none';
+               paneles[i].classList.remove('active');
+           }
+           var botones = document.getElementsByClassName('nav-btn');
+           for (var i = 0; i < botones.length; i++) {
+               botones[i].className = botones[i].className.replace(' active', '');
+           }
+           var panel = document.getElementById(tabId);
+           panel.style.display = 'block';
+           if (evt) {
+               evt.currentTarget.className += ' active';
+           } else {
+               var btn = document.querySelector('[onclick="abrirTab(event,\'' + tabId + '\')"]');
+               if (btn) btn.className += ' active';
+           }
+           if (tabId === 'tab3') {
+               setTimeout(update, 100);
+           }
+       }
+
+
+       // ── Init ──────────────────────────────────────────────────────────────
+       window.onload = function() {
+           setScenario('avg');
+           abrirTab(null, 'tab1');
+       };
+   </script>
+</body>
+</html>
+
 
